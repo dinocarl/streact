@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>STReact / STRedux</title>
+  <style>
+    #app {
+      font-family: Helvetica, Arial, sans-serif;
+    }
+    .cards {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-flow: row wrap;
+    }
+    .cards li {
+      flex: 1 0 auto;
+      list-style-type: none;
+      width: 30%;
+      line-height: 4em;
+      margin: .1em;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      border-style: solid;
+      border-width: 4px;
+    }
+    .cards li.u {
+      background-color: #fff;
+      border-color: #333;
+    }
+    .cards li.d {
+      background-color: lightblue;
+      border-color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">loading...</div>
+
+  <script type="text/javascript">
+    'use strict';
+
+    function addEventListener(el, eventName, handler) {
+      if (el.addEventListener) {
+        el.addEventListener(eventName, handler);
+      } else {
+        el.attachEvent('on' + eventName, function() {
+          handler.call(el);
+        });
+      }
+    }
+
+    function triggerEvent(el, eventName, payload) {
+      var event = new CustomEvent(eventName, payload);
+      el.dispatchEvent(event);
+    }
+
+    // App State
+
+    var initialData = {
+      title: 'Matching Game with stReact',
+      cards: [
+        {val: 1, dir: 'u'}, {val: 4, dir: 'd'}, {val: 8, dir: 'd'},
+        {val: 2, dir: 'd'}, {val: 3, dir: 'd'}, {val: 6, dir: 'd'},
+        {val: 4, dir: 'd'}, {val: 1, dir: 'u'}, {val: 5, dir: 'd'},
+        {val: 5, dir: 'd'}, {val: 6, dir: 'd'}, {val: 3, dir: 'd'},
+        {val: 10, dir: 'd'}, {val: 12, dir: 'd'}, {val: 11, dir: 'd'},
+        {val: 7, dir: 'd'}, {val: 9, dir: 'd'}, {val: 2, dir: 'd'},
+        {val: 8, dir: 'd'}, {val: 7, dir: 'd'}, {val: 9, dir: 'd'},
+        {val: 10, dir: 'd'}, {val: 11, dir: 'd'}, {val: 12, dir: 'd'}
+      ],
+      matched: [0,7],
+      attempt: [],
+      mode: 'play',
+      correctLabel: 'Matched Pairs:',
+      numCorrect: 1
+    };
+
+    var Store = function (initialState, id) {
+      this.history = [initialState, initialState];
+
+      this.currentIdx = function currentIdx() {
+        return this.history.length - 1;
+      };
+
+      this.currentState = function currentState() {
+        return this.history[this.currentIdx()];
+      };
+
+      this.update = function update(data) {
+        var next = Object.assign(
+          {},
+          this.currentState(),
+          data
+        );
+        this.history.push(next);
+        triggerEvent(document, 'AppStateUpdated' + id, {detail: next});
+        return next;
+      };
+
+      this.at = function at(idx) {
+        return this.history[idx];
+      };
+
+      this.reapply = function reapply(idx) {
+        var item = this.at(idx);
+        this.history.push(item);
+        triggerEvent(document, 'AppStateUpdated' + id, {detail: item});
+        return item;
+      };
+    };
+
+    // Utility
+
+    var compose = function compose() {
+      var fnList = Array.prototype.slice.call(arguments);
+
+      return function (data) {
+        return fnList.reduceRight(function (val, fn) {
+          return fn(val);
+        }, data);
+      };
+    };
+
+    var curry = function curry(fn) {
+      return function () {
+        var xs = Array.prototype.slice.call(arguments);
+
+        if (xs.length >= fn.length) {
+          return fn.apply(undefined, xs);
+        }
+
+        return curry(fn.bind.apply(fn, [null].concat(xs)));
+      };
+    };
+
+    var map = curry(function map(fn, list) {
+      return list.map(fn);
+    });
+
+    var filter = curry(function filter(fn, list) {
+      return list.filter(fn);
+    });
+
+    var reduce = curry(function reduce(fn, acc, data) {
+      return data.reduce(fn, acc);
+    });
+
+    // Arrays
+
+    var join = curry(function join(glue, list) {
+      return list.join(glue);
+    });
+
+    var concat = function concat(item) {
+      return function (arr) {
+        return arr.concat(item);
+      };
+    };
+
+    // Math
+
+    var add = curry(function add(a, b) {
+      return a + b;
+    });
+
+    var sum = reduce(add, 0);
+
+    var strConcat = join('');
+
+    // HTML Components
+
+    var Card = function card(item, idx) {
+      var dirCases = {
+        u: item.val,
+        d: '✽ ✽ ✽'
+      };
+      return strConcat([
+        '<li class="',
+        item.dir,
+        '" onclick="flip(',
+        idx,
+        ')">',
+        dirCases[item.dir],
+        '</li>'
+      ]);
+    };
+
+    var Cards = compose(
+      strConcat,
+      map(Card)
+    );
+
+    var CardsContainer = function toDosHtml(list) {
+      return strConcat([
+        '<ul class="cards">',
+        Cards(list),
+        '</ul>'
+      ]);
+    };
+
+    var title = function title(props) {
+      return strConcat([
+        '<h1>',
+        props.title,
+        '</h1>'
+      ]);
+    };
+
+    var totalIndicator = function totalIndicator(props) {
+      return strConcat([
+        '<span>',
+        props.correctLabel,
+        ' ',
+        props.numCorrect,
+        '</span>'
+      ]);
+    };
+
+    var html = function html(props) {
+      return strConcat([
+        '<section>',
+        title(props),
+        CardsContainer(props.cards),
+        totalIndicator(props),
+        '</section>'
+      ]);
+    };
+
+    // App Stuff
+    var storeName = 'MatchGame';
+
+    var appState = new Store(initialData, storeName);
+
+    var appEl = document.getElementById('app');
+
+    var render = curry(function render(fn, state) {
+      return appEl.innerHTML = fn(state);
+    });
+
+    // Re-render on state changes
+    addEventListener(document, 'AppStateUpdated' + storeName, function(e) {
+      render(html, e.detail);
+    });
+
+
+    // Store Actions
+    var revert = function revert(to) {
+      appState.reapply(appState.history.length - to);
+    };
+
+    var commit = function commit(to, state, attempt, match) {
+      appState.update(
+        {
+        	cards: state,
+          attempt: [],
+          matched: match,
+          numCorrect: match.length / 2
+        }
+      );
+    };
+
+    var stage = function stage(to, state, attempt, match) {
+      appState.update(
+        {
+        	cards: state,
+          attempt: attempt
+        }
+      );
+    };
+
+    var stageThenRevert = function stage(to, state, attempt, match) {
+      appState.update(
+        {
+          cards: state,
+          attempt: attempt,
+          mode: 'pause'
+        }
+      );
+      setTimeout(function () {
+        revert(3);
+      }, 650);
+    };
+
+    var matchType = function (arr) {
+      var matchCases = {
+        falsefalse: stage,
+        falsetrue: revert,
+        truefalse: stageThenRevert,
+        truetrue: commit,
+      };
+      return matchCases[strConcat([
+        arr.length === 2 && arr[0].idx !== arr[1].idx,
+        arr.length === 2 && arr[0].val === arr[1].val
+      ])]
+    };
+
+    // Event Handlers
+    var flip = function flip(idx) {
+      var cardDirCases = {
+        true: {
+          d: 'u',
+          u: 'd'
+        },
+        false: {
+          d: 'd',
+          u: 'u'
+        }
+      };
+      var currentState = appState.currentState();
+      var currentCards = currentState.cards;
+      var currentMatches = currentState.matched;
+      if (currentMatches.indexOf(idx) === -1 && currentState.mode === 'play') {
+        var nextAttempt = currentState.attempt.concat(idx);
+        var nextMatch = currentMatches.concat(nextAttempt);
+        var possibleMatch = map(function(item){
+          return Object.assign(
+            {idx: item},
+            currentCards[item]
+          )
+        }, nextAttempt);
+        var nextState = map(function(card, cardIndex) {
+          return Object.assign(
+            {},
+            card,
+            {dir: cardDirCases[cardIndex === idx][card.dir]}
+          );
+        }, currentCards);
+
+        return matchType(possibleMatch)(2, nextState, nextAttempt, nextMatch);
+      }
+    }
+
+    render(html, initialData);
+  </script>
+
+</body>
+</html>

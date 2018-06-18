@@ -10,4 +10,4 @@ Has
 
 At the moment, actions have direct access to a store's instance (which would be likely to change).
 
-Try it out with the simple [matching game](matchGame.html) I made. It can either just be run directly in a browser, or can be seen in this [jsfiddle](https://jsfiddle.net/ewc7s61x/)
+Try it out with the simple [matching game](matchGame.html) I made. It can either just be run directly in a browser, or can be seen in this [jsfiddle](https://jsfiddle.net/ewc7s61x/2/)

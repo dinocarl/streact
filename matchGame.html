@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>STReact / STRedux</title>
+  <title>stReact / stRedux</title>
   <style>
     #app {
       font-family: Helvetica, Arial, sans-serif;
@@ -12,23 +12,36 @@
       display: flex;
       flex-flow: row wrap;
     }
-    .cards li {
+    .card {
       flex: 1 0 auto;
       list-style-type: none;
       width: 30%;
-      line-height: 4em;
+      line-height: 2em;
       margin: .1em;
+      font-size: 2em;
       text-align: center;
       cursor: pointer;
       border-radius: 5px;
       border-style: solid;
       border-width: 4px;
     }
-    .cards li.u {
+    .card:nth-child(even){
+      transform: rotate(1.5deg);
+    }
+    .card:nth-child(4n-1){
+      transform: rotate(3deg);
+    }
+    .card:nth-child(5n-1){
+      transform: rotate(-2deg);
+    }
+    .card:nth-child(6n-1){
+      transform: rotate(1deg);
+    }
+    .card.u {
       background-color: #fff;
       border-color: #333;
     }
-    .cards li.d {
+    .card.d {
       background-color: lightblue;
       border-color: #666;
     }
@@ -61,16 +74,16 @@
     var initialData = {
       title: 'Matching Game with stReact',
       cards: [
-        {val: 1, dir: 'u'}, {val: 4, dir: 'd'}, {val: 8, dir: 'd'},
-        {val: 2, dir: 'd'}, {val: 3, dir: 'd'}, {val: 6, dir: 'd'},
-        {val: 4, dir: 'd'}, {val: 1, dir: 'u'}, {val: 5, dir: 'd'},
-        {val: 5, dir: 'd'}, {val: 6, dir: 'd'}, {val: 3, dir: 'd'},
-        {val: 10, dir: 'd'}, {val: 12, dir: 'd'}, {val: 11, dir: 'd'},
-        {val: 7, dir: 'd'}, {val: 9, dir: 'd'}, {val: 2, dir: 'd'},
-        {val: 8, dir: 'd'}, {val: 7, dir: 'd'}, {val: 9, dir: 'd'},
-        {val: 10, dir: 'd'}, {val: 11, dir: 'd'}, {val: 12, dir: 'd'}
+        {val: '💀', dir: 'd'}, {val: '🦄', dir: 'd'}, {val: '💖', dir: 'd'}, 
+        {val: '🦊', dir: 'u'}, {val: '😎', dir: 'd'}, {val: '😄', dir: 'd'}, 
+        {val: '🦇', dir: 'd'}, {val: '😱', dir: 'd'}, {val: '😬', dir: 'd'}, 
+        {val: '🍧', dir: 'd'}, {val: '👻', dir: 'd'}, {val: '🐨', dir: 'd'}, 
+        {val: '😬', dir: 'd'}, {val: '😎', dir: 'd'}, {val: '🦊', dir: 'u'}, 
+        {val: '👻', dir: 'd'}, {val: '💀', dir: 'd'}, {val: '🍧', dir: 'd'}, 
+        {val: '🐨', dir: 'd'}, {val: '🦄', dir: 'd'}, {val: '💖', dir: 'd'}, 
+        {val: '😄', dir: 'd'}, {val: '😱', dir: 'd'}, {val: '🦇', dir: 'd'},
       ],
-      matched: [0,7],
+      matched: [3, 14],
       attempt: [],
       mode: 'play',
       correctLabel: 'Matched Pairs:',
@@ -177,7 +190,7 @@
         d: '✽ ✽ ✽'
       };
       return strConcat([
-        '<li class="',
+        '<li class="card ',
         item.dir,
         '" onclick="flip(',
         idx,
@@ -202,7 +215,7 @@
 
     var title = function title(props) {
       return strConcat([
-        '<h1>',
+        '<h1 class="title">',
         props.title,
         '</h1>'
       ]);
@@ -210,17 +223,17 @@
 
     var totalIndicator = function totalIndicator(props) {
       return strConcat([
-        '<span>',
+        '<h3 class="score">',
         props.correctLabel,
         ' ',
         props.numCorrect,
-        '</span>'
+        '</h3>'
       ]);
     };
 
     var html = function html(props) {
       return strConcat([
-        '<section>',
+        '<section class="match-game">',
         title(props),
         CardsContainer(props.cards),
         totalIndicator(props),

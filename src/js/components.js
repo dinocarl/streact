@@ -1,48 +1,53 @@
 // HTML Components
+import { mapWithIndex } from './utils';
+import { appState } from './framework';
+import flip from './actions';
+
 import {
-  compose,
-  map,
-  join
-} from 'ramda';
+  li,
+  ul,
+  h1,
+  h3,
+  section
+} from './h';
 
 const Card = (item, idx) => {
   const dirCases = {
     u: item.val,
-    d: '✽ ✽ ✽'
+    d: `✽ ✽ ✽`
   };
-  return `
-<li class="card ${item.dir}" onclick="flip('${idx}')">
-  ${dirCases[item.dir]}
-</li>`;
+  return li(
+    {
+      className: `card ${item.dir}`,
+      onclick: () => flip(appState().currentState(), idx)
+    },
+    dirCases[item.dir]
+  );
 };
 
-const Cards = compose(
-  join(''),
-  map(Card)
+const Cards = mapWithIndex(Card);
+
+const CardsContainer = list => ul(
+  { className: `cards` },
+  Cards(list)
 );
 
-const CardsContainer = (list) => `
-<ul class="cards">
-  ${Cards(list)}
-</ul>`;
+const title = props => h1(
+  { className: `title` },
+  props.title
+);
 
-const title = (props) => `
-<h1 class="title">
-  ${props.title}
-</h1>`;
+const totalIndicator = props => h3(
+  { className: `score` },
+  `${props.correctLabel} ${props.numCorrect}`
+);
 
-const totalIndicator = (props) => `
-<h3 class="score">
-  ${props.correctLabel}
-  ${props.numCorrect}
-</h3>`;
-
-const html = (props) => `
-<section class="match-game">
-  ${title(props)}
-  ${CardsContainer(props.cards)}
-  ${totalIndicator(props)}
-</section>`;
+const html = props => section(
+  { className: `match-game` },
+  title(props),
+  CardsContainer(props.cards),
+  totalIndicator(props)
+);
 
 export {
   Card,

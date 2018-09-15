@@ -1,22 +1,31 @@
 import '../css/app.css';
 import initialData from './data';
-import { Store, render, addEventListener } from './framework';
+import {
+  StoreHouse,
+  Store,
+  render,
+  addEventListener
+} from './framework';
 import { html } from './components';
 
 // App Stuff
-const appState = new Store(initialData);
+const appName = `MatchGame`;
 
+const appState = new Store(appName, initialData);
 // make sure the initial state is duplicated in the Store
-appState.getInstance().update(initialData);
+appState.update(initialData);
+
+const allStores = new StoreHouse();
+allStores.add(appName, appState);
 
 const appEl = document.getElementById(`app`);
 
 // Re-render on state changes
-addEventListener(document, `StoreUpdated`, (e) => render(appEl, html, e.detail));
+addEventListener(document, `StoreUpdated${appName}`, (e) => render(appEl, html, e.detail));
 
 // Initial render
 render(
   appEl,
   html,
-  appState.getInstance().currentState()
+  allStores.Stores[appName].currentState()
 );

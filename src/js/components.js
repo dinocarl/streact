@@ -1,6 +1,6 @@
 // HTML Components
 import { mapWithIndex } from './utils';
-import { appState } from './framework';
+import { appStores } from './framework';
 import flip from './actions';
 
 import {
@@ -19,7 +19,7 @@ const Card = (item, idx) => {
   return li(
     {
       className: `card ${item.dir}`,
-      onclick: () => flip(appState().currentState(), idx)
+      onclick: () => flip(appStores().Stores.MatchGame.currentState(), idx)
     },
     dirCases[item.dir]
   );

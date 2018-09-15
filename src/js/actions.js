@@ -1,7 +1,9 @@
 // Actions
 import { map, merge } from 'ramda';
-import { appState } from './framework';
+import { appStores } from './framework';
 import { mapWithIndex, strConcat } from './utils';
+
+const appState = () => appStores().Stores.MatchGame;
 
 // Event Handlers
 const revert = to => {

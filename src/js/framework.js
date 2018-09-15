@@ -21,15 +21,11 @@ function triggerEvent(el, eventName, payload) {
   el.dispatchEvent(event);
 }
 
-let storeInstance;
 // Store
-class __Store {
-  constructor(initialState) {
-    if (!storeInstance) {
-      storeInstance = this;
-    }
+class Store {
+  constructor(id, initialState) {
+    this.id = id;
     this.history = [initialState];
-    return storeInstance;
   }
 
   currentIdx() {
@@ -46,7 +42,7 @@ class __Store {
       data
     );
     this.history.push(next);
-    triggerEvent(document, `StoreUpdated`, { detail: next });
+    triggerEvent(document, `StoreUpdated${this.id}`, { detail: next });
     return next;
   }
 
@@ -57,34 +53,42 @@ class __Store {
   reapply(idx) {
     const item = this.at(idx);
     this.history.push(item);
-    triggerEvent(document, `StoreUpdated`, { detail: item });
+    triggerEvent(document, `StoreUpdated${this.id}`, { detail: item });
     return item;
   }
 }
 
-function Store(initialState) {
-  let instance;
-  this.getInstance = function getInstance() {
-    if (!instance) {
-      return new __Store(initialState);
+let storeHouseInstance;
+// StoreHosue
+class StoreHouse {
+  constructor() {
+    if (!storeHouseInstance) {
+      storeHouseInstance = this;
     }
-    return instance;
+    this.Stores = {};
+    return storeHouseInstance;
   }
-};
 
-const appState = () => new Store().getInstance();
+  add(id, obj) {
+    this.Stores[id] = obj;
+    return obj;
+  }
+}
+
+const appStores = () => new StoreHouse();
 
 // Rendering
 const render = curry((el, fn, state) => {
-  while(el.firstChild){
+  while (el.firstChild) {
     el.removeChild(el.firstChild);
   }
-  el.appendChild(fn(state))}
-);
+  el.appendChild(fn(state));
+});
 
 export {
+  StoreHouse,
   Store,
   render,
-  appState,
+  appStores,
   addEventListener
 };

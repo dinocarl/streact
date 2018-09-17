@@ -1,6 +1,7 @@
 import {
   curry,
   merge,
+  mergeAll,
   last,
   nth
 } from 'ramda';
@@ -25,7 +26,12 @@ function triggerEvent(el, eventName, payload) {
 class Store {
   constructor(id, initialState) {
     this.id = id;
-    this.history = [initialState];
+    this.history = [
+      merge(
+        { __ts: new Date().valueOf() },
+        initialState
+      )
+    ];
   }
 
   currentIdx() {
@@ -36,13 +42,16 @@ class Store {
     return last(this.history);
   }
 
-  update(data) {
-    const next = merge(
+  update(data, silent) {
+    const next = mergeAll([
       this.currentState(),
+      { __ts: new Date().valueOf() },
       data
-    );
+    ]);
     this.history.push(next);
-    triggerEvent(document, `StoreUpdated${this.id}`, { detail: next });
+    if (silent !== `silent`) {
+      triggerEvent(document, `StoreUpdated${this.id}`, { detail: next });
+    }
     return next;
   }
 

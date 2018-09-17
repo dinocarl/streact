@@ -10,8 +10,9 @@ import {
   strConcat,
   isInPlayMode
 } from './utils';
+import appName from './config';
 
-const appState = () => appStores().Stores.MatchGame;
+const appState = () => appStores().Stores[appName];
 
 // Event Handlers
 // Side Effect-y

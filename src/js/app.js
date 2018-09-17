@@ -7,14 +7,13 @@ import {
   addEventListener
 } from './framework';
 import { html } from './components';
-
-// App Stuff
-const appName = `MatchGame`;
+import appName from './config';
 
 const appState = new Store(appName, initialData);
 // make sure the initial state is duplicated in the Store
 appState.update(initialData);
 
+// Initialize the Store
 const allStores = new StoreHouse();
 allStores.add(appName, appState);
 

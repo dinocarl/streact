@@ -88,10 +88,13 @@ const appStores = () => new StoreHouse();
 
 // Rendering
 const render = curry((el, fn, state) => {
-  while (el.firstChild) {
-    el.removeChild(el.firstChild);
+  if (el !== null) {
+    while (el.firstChild) {
+      el.removeChild(el.firstChild);
+    }
+    return el.appendChild(fn(state));
   }
-  el.appendChild(fn(state));
+  return null;
 });
 
 export {

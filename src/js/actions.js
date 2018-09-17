@@ -1,11 +1,20 @@
 // Actions
-import { map, merge } from 'ramda';
+import {
+  map,
+  merge,
+  contains
+} from 'ramda';
 import { appStores } from './framework';
-import { mapWithIndex, strConcat } from './utils';
+import {
+  mapWithIndex,
+  strConcat,
+  isInPlayMode
+} from './utils';
 
 const appState = () => appStores().Stores.MatchGame;
 
 // Event Handlers
+// Side Effect-y
 const revert = to => {
   appState().reapply(appState().history.length - to);
 };
@@ -67,7 +76,7 @@ const flip = (state, idx) => {
   };
   const currentCards = state.cards;
   const currentMatches = state.matched;
-  if (currentMatches.indexOf(idx) === -1 && state.mode === `play`) {
+  if (!contains(idx, currentMatches) && isInPlayMode(state)) {
     const nextAttempt = state.attempt.concat(idx);
     const nextMatch = currentMatches.concat(nextAttempt);
     const possibleMatch = map((item) => merge(

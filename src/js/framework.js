@@ -1,12 +1,43 @@
 import {
+  compose,
   curry,
   merge,
   mergeAll,
   last,
+  length,
+  dec,
   nth
 } from 'ramda';
 
-//  Base Functions
+// Base Functions
+// initializeHistory :: (State, Date) -> History
+const initializeHistory = (initialState, timestamp) => ([
+  merge(
+    { __ts: timestamp },
+    initialState
+  )
+]);
+
+// currentIdx :: History -> Index
+const currentIdx = compose(
+  dec,
+  length
+);
+
+// currentState :: History -> State
+const currentState = last;
+
+// nextState :: State -> State -> Date -> State
+const nextState = curry(
+  (initialState, modifications, timestamp) => mergeAll([
+    initialState,
+    { __ts: timestamp },
+    modifications
+  ])
+);
+
+// at :: (History, Index) -> State
+const at = nth;
 
 // Eventing
 function addEventListener(el, eventName, handler) {
@@ -26,28 +57,23 @@ function triggerEvent(el, eventName, payload) {
 class Store {
   constructor(id, initialState) {
     this.id = id;
-    this.history = [
-      merge(
-        { __ts: new Date().valueOf() },
-        initialState
-      )
-    ];
+    this.history = initializeHistory(initialState, new Date().valueOf());
   }
 
   currentIdx() {
-    return this.history.length - 1;
+    return currentIdx(this.history);
   }
 
   currentState() {
-    return last(this.history);
+    return currentState(this.history);
   }
 
   update(data, silent) {
-    const next = mergeAll([
+    const next = nextState(
       this.currentState(),
-      { __ts: new Date().valueOf() },
-      data
-    ]);
+      data,
+      new Date().valueOf()
+    );
     this.history.push(next);
     if (silent !== `silent`) {
       triggerEvent(document, `StoreUpdated${this.id}`, { detail: next });
@@ -56,7 +82,7 @@ class Store {
   }
 
   at(idx) {
-    return nth(idx, this.history);
+    return at(idx, this.history);
   }
 
   reapply(idx) {
@@ -68,7 +94,7 @@ class Store {
 }
 
 let storeHouseInstance;
-// StoreHosue
+// StoreHouse
 class StoreHouse {
   constructor() {
     if (!storeHouseInstance) {
@@ -98,6 +124,11 @@ const render = curry((el, fn, state) => {
 });
 
 export {
+  initializeHistory,
+  currentIdx,
+  currentState,
+  nextState,
+  at,
   StoreHouse,
   Store,
   render,

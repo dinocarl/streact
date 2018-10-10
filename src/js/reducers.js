@@ -1,6 +1,5 @@
 import {
   append,
-  concat,
   map,
   merge,
 } from 'ramda';
@@ -20,7 +19,7 @@ const nextStateCandidate = (state, idx) => {
   };
   const currentCards = state.cards;
   const nextAttempt = append(idx, state.attempt);
-  const nextMatch = concat(state.matched, nextAttempt);
+  const nextMatch = append(nextAttempt, state.matched);
   const possibleMatch = map(
     (item) => merge(
       { idx: item },

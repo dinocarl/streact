@@ -22,7 +22,7 @@ const commit = (to, state, attempt, match) => {
       cards: state,
       attempt: [],
       matched: match,
-      numCorrect: match.length / 2
+      numCorrect: match.length
     }
   );
 };

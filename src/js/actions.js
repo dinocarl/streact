@@ -1,17 +1,11 @@
 // Actions
-import {
-  map,
-  merge,
-  contains,
-  append,
-  concat
-} from 'ramda';
+import { contains } from 'ramda';
 import { appStores } from './framework';
 import {
-  mapWithIndex,
   strConcat,
   isInPlayMode
 } from './utils';
+import nextStateCandidate from './reducers';
 import appName from './config';
 
 const appState = () => appStores().Stores[appName];
@@ -67,36 +61,13 @@ const matchType = arr => {
 };
 
 const flip = (state, idx) => {
-  const cardDirCases = {
-    true: {
-      d: `u`,
-      u: `d`
-    },
-    false: {
-      d: `d`,
-      u: `u`
-    }
-  };
-  const currentCards = state.cards;
-  const currentMatches = state.matched;
-  if (!contains(idx, currentMatches) && isInPlayMode(state)) {
-    const nextAttempt = append(idx, state.attempt);
-    const nextMatch = concat(currentMatches, nextAttempt);
-    const possibleMatch = map(
-      (item) => merge(
-        { idx: item },
-        currentCards[item]
-      ),
-      nextAttempt
-    );
-    const nextState = mapWithIndex(
-      (card, cardIndex) => merge(
-        card,
-        { dir: cardDirCases[cardIndex === idx][card.dir] }
-      ),
-      currentCards
-    );
-
+  if (!contains(idx, state.matched) && isInPlayMode(state)) {
+    const {
+      possibleMatch,
+      nextState,
+      nextAttempt,
+      nextMatch
+    } = nextStateCandidate(state, idx);
     return matchType(possibleMatch)(2, nextState, nextAttempt, nextMatch);
   }
   return state;

@@ -2,7 +2,9 @@
 import {
   map,
   merge,
-  contains
+  contains,
+  append,
+  concat
 } from 'ramda';
 import { appStores } from './framework';
 import {
@@ -78,16 +80,22 @@ const flip = (state, idx) => {
   const currentCards = state.cards;
   const currentMatches = state.matched;
   if (!contains(idx, currentMatches) && isInPlayMode(state)) {
-    const nextAttempt = state.attempt.concat(idx);
-    const nextMatch = currentMatches.concat(nextAttempt);
-    const possibleMatch = map((item) => merge(
-      { idx: item },
-      currentCards[item]
-    ), nextAttempt);
-    const nextState = mapWithIndex((card, cardIndex) => merge(
-      card,
-      { dir: cardDirCases[cardIndex === idx][card.dir] }
-    ), currentCards);
+    const nextAttempt = append(idx, state.attempt);
+    const nextMatch = concat(currentMatches, nextAttempt);
+    const possibleMatch = map(
+      (item) => merge(
+        { idx: item },
+        currentCards[item]
+      ),
+      nextAttempt
+    );
+    const nextState = mapWithIndex(
+      (card, cardIndex) => merge(
+        card,
+        { dir: cardDirCases[cardIndex === idx][card.dir] }
+      ),
+      currentCards
+    );
 
     return matchType(possibleMatch)(2, nextState, nextAttempt, nextMatch);
   }

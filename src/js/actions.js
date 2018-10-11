@@ -6,45 +6,54 @@ import {
   isInPlayMode
 } from './utils';
 import nextStateCandidate from './reducers';
-import appName from './config';
+import { AppName, MatchGame } from './config';
 
-const appState = () => appStores().Stores[appName];
+const appState = () => appStores().Stores[AppName];
+const gameState = () => appStores().Stores[MatchGame];
 
 // Event Handlers
 // Side Effect-y
 const revert = to => {
-  appState().reapply(appState().history.length - to);
+  const payload = gameState().reapply(gameState().history.length - to);
+  appState().update(payload, `silent`);
+  return payload;
 };
 
 const commit = (to, state, attempt, match) => {
-  appState().update(
-    {
-      cards: state,
-      attempt: [],
-      matched: match,
-      numCorrect: match.length
-    }
-  );
+  const commitState = {
+    cards: state,
+    attempt: [],
+    matched: match,
+    numCorrect: match.length
+  };
+
+  const payload = gameState().update(commitState);
+  appState().update(payload, `silent`);
+  return payload;
 };
 
 const stage = (to, state, attempt) => {
-  appState().update(
-    {
-      attempt,
-      cards: state
-    }
-  );
+  const stageState = {
+    attempt,
+    cards: state
+  };
+
+  const payload = gameState().update(stageState);
+  appState().update(payload, `silent`);
+  return payload;
 };
 
 const stageThenRevert = (to, state, attempt) => {
-  appState().update(
-    {
-      attempt,
-      cards: state,
-      mode: `pause`
-    }
-  );
+  const stageState = {
+    attempt,
+    cards: state,
+    mode: `pause`
+  };
+
+  const payload = gameState().update(stageState);
+  appState().update(payload, `silent`);
   setTimeout(() => revert(3), 650);
+  return payload;
 };
 
 const matchType = arr => {
@@ -74,3 +83,5 @@ const flip = (state, idx) => {
 };
 
 export default flip;
+
+export { commit };

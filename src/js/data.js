@@ -11,8 +11,11 @@ export const gameBoard = [
   `😄`, `😱`, `🦇`,
 ];
 
+export const initialTitle = {
+  title: `Showcase`
+};
+
 export default {
-  title: `Matching Game with stReact`,
   cards: [],
   matched: [],
   attempt: [],

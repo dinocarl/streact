@@ -1,6 +1,6 @@
 import '../css/app.css';
 import { map, merge } from 'ramda';
-import defaultGameState, { gameBoard, initialTitle } from './data';
+import defaultGameState, { gameVals, initialTitle } from './data';
 import {
   StoreHouse,
   Store,
@@ -10,14 +10,14 @@ import {
 import {
   html,
   pageTitle,
-  game
+  gameBoard
 } from './components';
 import { AppName, MatchGame, Title } from './config';
 
 // Set up the board
 const cards = map(
   (val) => ({ val, dir: `d` }),
-  gameBoard
+  gameVals
 );
 
 const initialGameState = merge(
@@ -50,7 +50,11 @@ allStores.add(MatchGame, gameStore);
 const appEl = document.getElementById(`app`);
 
 // Re-render the entire app
-addEventListener(document, `StoreUpdated${AppName}`, (e) => render(appEl, html, e.detail));
+addEventListener(document, `StoreUpdated${AppName}`, (e) => render(
+  appEl,
+  html,
+  e.detail
+));
 
 // Re-render the title
 addEventListener(document, `StoreUpdated${Title}`, (e) => render(
@@ -61,8 +65,8 @@ addEventListener(document, `StoreUpdated${Title}`, (e) => render(
 
 // Re-render the game
 addEventListener(document, `StoreUpdated${MatchGame}`, (e) => render(
-  document.getElementById(`app-content`),
-  game,
+  document.getElementById(`game-container`),
+  gameBoard,
   e.detail
 ));
 

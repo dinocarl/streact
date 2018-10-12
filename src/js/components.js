@@ -52,21 +52,28 @@ export const totalIndicator = props => h3(
   `${props.correctLabel} ${props.numCorrect}`
 );
 
-export const game = props => section(
+export const gameBoard = props => section(
   { className: `match-game` },
   CardsContainer(props.cards),
   totalIndicator(props)
 );
 
-export const appContent = props => div(
+export const gameBoardContainer = props => div(
+  { id: `game-container` },
+  gameBoard(props)
+);
+
+export const appContent = content => div(
   {
     id: `app-content`,
     className: `app-content`
   },
-  game(props)
+  content
 );
 
 export const html = props => section(
   pageTitleContainer(props),
-  appContent(props)
+  appContent(
+    gameBoardContainer(props)
+  )
 );

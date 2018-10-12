@@ -1,6 +1,6 @@
 // Default Data
 
-export const gameBoard = [
+export const gameVals = [
   `💀`, `🦄`, `💖`,
   `🦊`, `😎`, `😄`,
   `🦇`, `😱`, `😬`,

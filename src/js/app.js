@@ -12,7 +12,11 @@ import {
   pageTitle,
   gameBoard
 } from './components';
-import { AppName, MatchGame, Title } from './config';
+import {
+  AppName,
+  MatchGame,
+  Title
+} from './config';
 
 // Set up the board
 const cards = map(
@@ -31,13 +35,16 @@ const initialAppState = merge(
   initialTitle
 );
 
-// Initialize the game's store
+// Initialize the stores
 const titleStore = new Store(Title, initialTitle);
 
 const gameStore = new Store(MatchGame, initialGameState);
 
 const appStore = new Store(AppName, initialAppState);
-// Ensure the initial state is duplicated in the Store
+
+// Ensure the initial game state is duplicated for "undos"
+gameStore.update(initialAppState);
+// Sync appState with the game store
 appStore.update(initialAppState);
 
 // Initialize the StoreHouse

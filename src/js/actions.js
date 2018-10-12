@@ -24,7 +24,7 @@ const commit = (to, state, attempt, match) => {
     cards: state,
     attempt: [],
     matched: match,
-    numCorrect: match.length
+    numCorrect: match.length / 2
   };
 
   const payload = gameState().update(commitState);

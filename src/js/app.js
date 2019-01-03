@@ -1,6 +1,6 @@
 import '../css/app.css';
 import { map, merge } from 'ramda';
-import defaultGameState, { gameVals, initialTitle } from './data';
+import defaultGameState, { gameVals, initialTitle, initialRoute } from './data';
 import {
   StoreHouse,
   Store,
@@ -14,6 +14,7 @@ import {
 } from './components';
 import {
   AppName,
+  Router,
   MatchGame,
   Title
 } from './config';
@@ -36,6 +37,8 @@ const initialAppState = merge(
 );
 
 // Initialize the stores
+const routerStore = new Store(Router, initialRoute);
+
 const titleStore = new Store(Title, initialTitle);
 
 const gameStore = new Store(MatchGame, initialGameState);
@@ -50,9 +53,11 @@ appStore.update(initialAppState);
 // Initialize the StoreHouse
 const allStores = new StoreHouse();
 allStores.add(AppName, appStore);
+allStores.add(Router, routerStore);
 allStores.add(Title, titleStore);
 allStores.add(MatchGame, gameStore);
 
+window.as = allStores;
 // Cache the app's root element
 const appEl = document.getElementById(`app`);
 

@@ -6,10 +6,15 @@ import {
   isInPlayMode
 } from './utils';
 import nextStateCandidate from './reducers';
-import { AppName, MatchGame } from './config';
+import {
+  AppName,
+  Router,
+  MatchGame
+} from './config';
 
 const appState = () => appStores().Stores[AppName];
 const gameState = () => appStores().Stores[MatchGame];
+const routeState = () => appStores().Stores[Router];
 
 // Event Handlers
 // Side Effect-y
@@ -82,6 +87,16 @@ const flip = (state, idx) => {
   return state;
 };
 
+const routeTo = route => {
+  const routeReq = { route };
+  const payload = routeState().update(routeReq);
+  appState().update(payload, `silent`);
+  return payload;
+};
+
 export default flip;
 
-export { commit };
+export {
+  commit,
+  routeTo
+};
